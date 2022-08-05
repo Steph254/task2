@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import handler from "../../middleware/_defaultHandler"
+import { harperCreateNewUser } from "../../utils/harperdb/createNewUser"
 
 export default handler.post(
   async (req: NextApiRequest, res: NextApiResponse) => {
@@ -9,8 +10,18 @@ export default handler.post(
     if (errors.length > 0) {
       return res.status(400).json({ error: errors })
     }
+    try {
+      const { response, result } = await harperCreateNewUser(
+        username,
+        password1
+      )
+      return res.status(response.status).json(result)
+    } catch (err) {
+      return res.status(500).json({ error: err })
+    }
   }
 )
+ 
 
 const getFormErrors = (
   username: string,
